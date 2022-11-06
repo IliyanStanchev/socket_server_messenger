@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<persistence xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             version="2.1"
+             xmlns="http://xmlns.jcp.org/xml/ns/persistence"
+             xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd">
+
+    <persistence-unit name="default">
+        <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
+
+        <class>bg.tu_varna.sit.si.models.User</class>
+
+        <properties>
+            <property name="hibernate.connection.url"
+                      value="jdbc:mysql://localhost:3306/messenger?serverTimezone=UTC"/>
+            <property name="hibernate.connection.driver_class"
+                      value="com.mysql.cj.jdbc.Driver"/>
+            <property name="hibernate.connection.user"
+                      value="root"/>
+            <property name="hibernate.connection.password"
+                      value="massive"/>
+            <property name="hibernate.dialect"
+                      value="org.hibernate.dialect.MySQL8Dialect"/>
+            <property name="hibernate.show_sql"
+                      value="true"/>
+            <property name="hibernate.format_sql"
+                      value="false"/>
+            <property name="hibernate.jdbc.time_zone"
+                      value="UTC"/>
+            <property name="javax.persistence.schema-generation.database.action"
+                      value="drop-and-create" />
+        </properties>
+    </persistence-unit>
+</persistence>
