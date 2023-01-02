@@ -1,22 +1,18 @@
 package bg.tu_varna.sit.si;
-
 import bg.tu_varna.sit.si.manager.EntityManagerExtender;
 import bg.tu_varna.sit.si.models.User;
-import bg.tu_varna.sit.si.repository.UserRepository;
+import bg.tu_varna.sit.si.security.PasswordEncoderWrapper;
 import bg.tu_varna.sit.si.server.MessengerSocketServer;
-import jakarta.persistence.EntityManager;
+import bg.tu_varna.sit.si.services.UserService;
+import bg.tu_varna.sit.si.tasks.UserNotificationsManager;
 
 import java.io.IOException;
 
 public class Main {
     public static void main(String[] args) throws IOException {
 
-        EntityManager entityManager = EntityManagerExtender.getEntityManager();
-
-        UserRepository userRepository = new UserRepository();
-
-        User user = new User("Iliyan", "Stanchev");
-        User updatedUser = userRepository.saveOrUpdate(user);
+        EntityManagerExtender.getEntityManager();
+        UserNotificationsManager.startNotifications();
 
         MessengerSocketServer server = new MessengerSocketServer();
         server.start(8080);

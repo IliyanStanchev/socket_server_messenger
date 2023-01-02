@@ -9,6 +9,8 @@
         <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
 
         <class>bg.tu_varna.sit.si.models.User</class>
+        <class>bg.tu_varna.sit.si.models.UserNotification</class>
+        <class>bg.tu_varna.sit.si.models.Chat</class>
 
         <properties>
             <property name="hibernate.connection.url"
@@ -28,7 +30,7 @@
             <property name="hibernate.jdbc.time_zone"
                       value="UTC"/>
             <property name="javax.persistence.schema-generation.database.action"
-                      value="drop-and-create" />
+                      value="update" />
         </properties>
     </persistence-unit>
 </persistence>

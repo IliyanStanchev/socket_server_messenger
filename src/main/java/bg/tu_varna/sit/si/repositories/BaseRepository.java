@@ -1,4 +1,4 @@
-package bg.tu_varna.sit.si.repository;
+package bg.tu_varna.sit.si.repositories;
 
 import bg.tu_varna.sit.si.manager.EntityManagerExtender;
 import jakarta.persistence.EntityManager;
@@ -23,7 +23,6 @@ public abstract class BaseRepository<EntityClass extends Serializable> {
     }
 
     public EntityClass findById(int id) {
-
 
         return EntityManagerExtender.getEntityManager().find(entityClass, id);
     }
