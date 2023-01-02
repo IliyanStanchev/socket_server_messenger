@@ -1,4 +1,4 @@
-package bg.tu_varna.sit.si.manager;
+package bg.tu_varna.sit.si.managers;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;

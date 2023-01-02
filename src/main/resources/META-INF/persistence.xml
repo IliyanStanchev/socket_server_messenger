@@ -11,6 +11,7 @@
         <class>bg.tu_varna.sit.si.models.User</class>
         <class>bg.tu_varna.sit.si.models.UserNotification</class>
         <class>bg.tu_varna.sit.si.models.Chat</class>
+        <class>bg.tu_varna.sit.si.models.ChatMessage</class>
 
         <properties>
             <property name="hibernate.connection.url"

@@ -6,6 +6,8 @@ import bg.tu_varna.sit.si.security.PasswordEncoderWrapper;
 
 public class UserService {
 
+    final static String SYSTEM_USER_EMAIL = "system";
+
     public static ResponseCodes.ResponseCodeTypes editProfile(User user) {
 
         UserRepository userRepository = new UserRepository();
@@ -25,6 +27,11 @@ public class UserService {
         }
 
         return ResponseCodes.ResponseCodeTypes.SUCCESS;
+    }
+
+    public static User getSystemUser() {
+
+        return new UserRepository().getUserByEmail(SYSTEM_USER_EMAIL);
     }
 
     public User login(User user) {

@@ -1,6 +1,6 @@
 package bg.tu_varna.sit.si.repositories;
 
-import bg.tu_varna.sit.si.manager.EntityManagerExtender;
+import bg.tu_varna.sit.si.managers.EntityManagerExtender;
 import bg.tu_varna.sit.si.models.User;
 import jakarta.persistence.NoResultException;
 

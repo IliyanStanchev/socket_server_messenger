@@ -1,6 +1,11 @@
 package bg.tu_varna.sit.si.requests;
+import bg.tu_varna.sit.si.enumerables.ChatType;
+import bg.tu_varna.sit.si.managers.SystemMessagesManager;
+import bg.tu_varna.sit.si.models.Chat;
+import bg.tu_varna.sit.si.models.ChatMessage;
 import bg.tu_varna.sit.si.models.User;
 import bg.tu_varna.sit.si.models.UserNotification;
+import bg.tu_varna.sit.si.services.ChatMessageService;
 import bg.tu_varna.sit.si.services.UserNotificationService;
 import bg.tu_varna.sit.si.services.UserService;
 import java.io.IOException;
@@ -25,6 +30,7 @@ public class RequestHandler {
                 handleSendMessage( inputStream, outputStream );
                 break;
             case GET_MESSAGES:
+                handleGetMessages( inputStream, outputStream );
                 break;
             case GET_USERS:
                 break;
@@ -32,6 +38,18 @@ public class RequestHandler {
                 handleEditProfile( inputStream, outputStream );
                 break;
         }
+    }
+
+    private static void handleGetMessages(ObjectInputStream inputStream, ObjectOutputStream outputStream) throws IOException, ClassNotFoundException {
+
+        String clientId = (String) inputStream.readObject();
+        Chat chat = (Chat) inputStream.readObject();
+
+        List<ChatMessage> messages = new ChatMessageService().getChatMessages( chat );
+
+        outputStream.writeObject(SocketRequests.SocketRequestType.GET_MESSAGES);
+        outputStream.writeObject(clientId);
+        outputStream.writeObject( messages );
     }
 
     private static void handleEditProfile(ObjectInputStream inputStream, ObjectOutputStream outputStream) throws IOException, ClassNotFoundException {
@@ -73,11 +91,19 @@ public class RequestHandler {
     private static void handleSendMessage(ObjectInputStream inputStream, ObjectOutputStream outputStream) throws IOException, ClassNotFoundException {
 
         String clientId = (String) inputStream.readObject();
-        String message = (String) inputStream.readObject();
+        ChatMessage message = (ChatMessage) inputStream.readObject();
+
+        ChatMessageService chatMessageService = new ChatMessageService();
+        chatMessageService.addNewMessage(message);
 
         outputStream.writeObject(SocketRequests.SocketRequestType.SEND_MESSAGE);
         outputStream.writeObject(clientId);
-        outputStream.writeObject("Message received: " + message);
+
+        if( message.getChat().getChatType() == ChatType.SYSTEM) {
+            ChatMessage answerMessage = SystemMessagesManager.getSystemMessage(message);
+            chatMessageService.addNewMessage(answerMessage);
+            outputStream.writeObject(answerMessage);
+        }
     }
 
     private static void handleLogin(ObjectInputStream inputStream, ObjectOutputStream outputStream) throws IOException, ClassNotFoundException {
