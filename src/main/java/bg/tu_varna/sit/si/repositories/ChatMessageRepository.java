@@ -18,4 +18,12 @@ public class ChatMessageRepository extends BaseRepository<ChatMessage> {
                 .setParameter("chatId", chat.getId())
                 .getResultList();
     }
+
+    public ChatMessage getLastMessage(int chatId) {
+
+        return (ChatMessage) EntityManagerExtender.getEntityManager().createQuery("FROM CHAT_MESSAGES c WHERE c.chat.id=: chatId ORDER BY c.creationDate DESC")
+                .setParameter("chatId", chatId)
+                .setMaxResults(1)
+                .getSingleResult();
+    }
 }

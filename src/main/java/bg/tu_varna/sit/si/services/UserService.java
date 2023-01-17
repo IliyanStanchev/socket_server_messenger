@@ -4,6 +4,8 @@ import bg.tu_varna.sit.si.repositories.UserRepository;
 import bg.tu_varna.sit.si.requests.ResponseCodes;
 import bg.tu_varna.sit.si.security.PasswordEncoderWrapper;
 
+import java.util.List;
+
 public class UserService {
 
     final static String SYSTEM_USER_EMAIL = "system";
@@ -32,6 +34,11 @@ public class UserService {
     public static User getSystemUser() {
 
         return new UserRepository().getUserByEmail(SYSTEM_USER_EMAIL);
+    }
+
+    public static List<User> getUsers(int currentUserId) {
+
+        return new UserRepository().getUsers(currentUserId);
     }
 
     public User login(User user) {

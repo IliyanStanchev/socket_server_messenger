@@ -32,7 +32,11 @@ public abstract class BaseRepository<EntityClass extends Serializable> {
         EntityTransaction entityTransaction = entityManager.getTransaction();
         try {
 
-            entityTransaction.begin();
+            boolean externalTransaction = entityTransaction.isActive();
+
+            if (!externalTransaction) {
+                entityTransaction.begin();
+            }
 
             if (entityManager.contains(entityObject))
                 entityManager.merge(entityObject);
@@ -40,7 +44,9 @@ public abstract class BaseRepository<EntityClass extends Serializable> {
             entityManager.persist(entityObject);
             entityManager.flush();
 
-            entityTransaction.commit();
+            if (!externalTransaction) {
+                entityTransaction.commit();
+            }
 
         } catch (RuntimeException e) {
 

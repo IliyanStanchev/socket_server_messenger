@@ -1,16 +1,21 @@
 package bg.tu_varna.sit.si.requests;
 import bg.tu_varna.sit.si.enumerables.ChatType;
+import bg.tu_varna.sit.si.managers.EntityManagerExtender;
 import bg.tu_varna.sit.si.managers.SystemMessagesManager;
 import bg.tu_varna.sit.si.models.Chat;
 import bg.tu_varna.sit.si.models.ChatMessage;
 import bg.tu_varna.sit.si.models.User;
 import bg.tu_varna.sit.si.models.UserNotification;
+import bg.tu_varna.sit.si.requestModels.ChatViewData;
+import bg.tu_varna.sit.si.requestModels.SearchChatData;
 import bg.tu_varna.sit.si.services.ChatMessageService;
+import bg.tu_varna.sit.si.services.ChatService;
 import bg.tu_varna.sit.si.services.UserNotificationService;
 import bg.tu_varna.sit.si.services.UserService;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class RequestHandler {
@@ -33,11 +38,72 @@ public class RequestHandler {
                 handleGetMessages( inputStream, outputStream );
                 break;
             case GET_USERS:
+                handleGetUsers( inputStream, outputStream );
                 break;
             case EDIT_PROFILE:
                 handleEditProfile( inputStream, outputStream );
                 break;
+            case GET_CHATS:
+                handleGetChats( inputStream, outputStream );
+                break;
+            case SEARCH_CHAT:
+                handleSearchChat( inputStream, outputStream );
+                break;
         }
+    }
+
+    private static void handleGetUsers(ObjectInputStream inputStream, ObjectOutputStream outputStream) throws IOException, ClassNotFoundException {
+
+        String clientId = (String) inputStream.readObject();
+        int currentUserId = (int) inputStream.readObject();
+
+        List<User> users = UserService.getUsers(currentUserId);
+
+        outputStream.writeObject(SocketRequests.SocketRequestType.GET_USERS);
+        outputStream.writeObject(clientId);
+        outputStream.writeObject( users );
+    }
+
+    private static void handleSearchChat(ObjectInputStream inputStream, ObjectOutputStream outputStream) throws IOException, ClassNotFoundException {
+
+        String clientId = (String) inputStream.readObject();
+        SearchChatData searchChatData = (SearchChatData) inputStream.readObject();
+
+        if( searchChatData.getOtherUser().getId() == 1 ){
+            searchChatData.setChatType(ChatType.SYSTEM);
+        }
+
+        EntityManagerExtender.beginTransaction();
+
+        Chat chat = ChatService.searchChat(searchChatData);
+        if( chat == null )
+        {
+            chat = ChatService.createChat(searchChatData);
+        }
+
+        if( chat == null )
+        {
+            EntityManagerExtender.rollbackTransaction();
+            return;
+        }
+
+        EntityManagerExtender.commitTransaction();
+
+        outputStream.writeObject(SocketRequests.SocketRequestType.SEARCH_CHAT);
+        outputStream.writeObject(clientId);
+        outputStream.writeObject( chat );
+    }
+
+    private static void handleGetChats(ObjectInputStream inputStream, ObjectOutputStream outputStream) throws IOException, ClassNotFoundException {
+
+        String clientId = (String) inputStream.readObject();
+        int userId = (int) inputStream.readObject();
+
+        List<ChatViewData> chats = new ChatService().getChats(userId);
+
+        outputStream.writeObject(SocketRequests.SocketRequestType.GET_CHATS);
+        outputStream.writeObject(clientId);
+        outputStream.writeObject( chats );
     }
 
     private static void handleGetMessages(ObjectInputStream inputStream, ObjectOutputStream outputStream) throws IOException, ClassNotFoundException {
@@ -95,6 +161,9 @@ public class RequestHandler {
 
         ChatMessageService chatMessageService = new ChatMessageService();
         chatMessageService.addNewMessage(message);
+
+        message.getChat().setLastActivity(LocalDateTime.now());
+        ChatService.updateChat(message.getChat());
 
         outputStream.writeObject(SocketRequests.SocketRequestType.SEND_MESSAGE);
         outputStream.writeObject(clientId);
